@@ -51,18 +51,18 @@ namespace DBA.FreshdeskSharp.Endpoints
             }
         }
 
-        public async Task<List<FreshdeskTicket<FreshdeskCustomFields>>> GetListAsync(FreshdeskTicketListOptions options)
+        public async Task<FreshDeskTicketWrapper<FreshdeskCustomFields>> GetListAsync(FreshdeskTicketListOptions options)
         {
             return await GetListAsync<FreshdeskCustomFields>(options).ConfigureAwait(false);
         }
 
-        public async Task<List<FreshdeskTicket<TCustomFieldObject>>> GetListAsync<TCustomFieldObject>(FreshdeskTicketListOptions options) where TCustomFieldObject : class
+        public async Task<FreshDeskTicketWrapper<TCustomFieldObject>> GetListAsync<TCustomFieldObject>(FreshdeskTicketListOptions options) where TCustomFieldObject : class
         {
             var query = GetListQueryString(options);
             var requestUri = $"{_apiBaseUri}/tickets{query}";
             using (var response = await _httpClient.GetAsync(requestUri).ConfigureAwait(false))
             {
-                return await GetResponseAsync<List<FreshdeskTicket<TCustomFieldObject>>>(response).ConfigureAwait(false);
+                return await GetResponseAsync<FreshDeskTicketWrapper<TCustomFieldObject>>(response).ConfigureAwait(false);
             }
         }
 
@@ -125,10 +125,16 @@ namespace DBA.FreshdeskSharp.Endpoints
             }
             if (options.UpdatedSince != default(DateTime?))
             {
-                filters.Add($"updated_since={options.UpdatedSince.Value}");
+                filters.Add($"updated_since={options.UpdatedSince.Value:yyyy-MM-ddTHH:mm:ssZ}");
             }
-            filters.Add($"order_by={options.OrderBy.ToOrderByString()}");
-            filters.Add($"order_type={options.OrderType.ToString().ToLower()}");
+            if (options.OrderBy != FreshdeskTicketOrderBy.None)
+            {
+                filters.Add($"order_by={options.OrderBy.ToOrderByString()}");
+            }
+            if (options.OrderType != FreshdeskOrderType.None)
+            {
+                filters.Add($"order_type={options.OrderType.ToString().ToLower()}");
+            }
             AddPageFilters(options, filters);
             return $"?{string.Join("&", filters)}";
         }

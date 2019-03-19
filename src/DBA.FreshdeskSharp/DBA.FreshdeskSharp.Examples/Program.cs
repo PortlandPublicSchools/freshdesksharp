@@ -8,8 +8,8 @@ namespace DBA.FreshdeskSharp.Examples
     {
         static void Main(string[] args)
         {
-            const string freshdeskDomain = "YOUR_DOMAIN_NAME.freshdesk.com";
-            const string freshdeskApiKey = "YOUR_API_KEY";
+            const string freshdeskDomain = "pps.freshservice.com";
+            const string freshdeskApiKey = "";
             GetAllContactsAsync(freshdeskDomain, freshdeskApiKey).GetAwaiter().GetResult();
         }
 
@@ -25,26 +25,32 @@ namespace DBA.FreshdeskSharp.Examples
             {
                 try
                 {
-                    var result = await client.Contacts.GetListAsync();
-                    var account = await client.Companies.CreateAsync(new FreshdeskCompany
+                    //var result = await client.Contacts.GetListAsync();
+                    FreshdeskTicketListOptions options = new FreshdeskTicketListOptions
                     {
-                        Name = "Fake Company Name, Inc."
-                    });
-                    var contact = await client.Contacts.CreateAsync(new FreshdeskContact
-                    {
-                        Active = true,
-                        Name = "Mr User Name",
-                        Email = "fakeusername1234@fakedomain.com",
-                        CompanyId = account.Id
-                    });
-                    var ticket = await client.Tickets.CreateAsync(new FreshdeskTicket
-                    {
-                        RequesterId = contact.Id,
-                        Subject = "Test",
-                        Description = "This is a test issue",
-                        FrDueBy = DateTime.UtcNow + TimeSpan.FromHours(5),
-                        DueBy = DateTime.UtcNow + TimeSpan.FromDays(2)
-                    });
+                        UpdatedSince = DateTime.Today
+                    };
+                    var result = client.Tickets.GetListAsync(options).Result;
+                    //var result = client.Tickets.GetAsync(2089).Result;
+                    //var account = await client.Companies.CreateAsync(new FreshdeskCompany
+                    //{
+                    //    Name = "Fake Company Name, Inc."
+                    //});
+                    //var contact = await client.Contacts.CreateAsync(new FreshdeskContact
+                    //{
+                    //    Active = true,
+                    //    Name = "Mr User Name",
+                    //    Email = "fakeusername1234@fakedomain.com",
+                    //    CompanyId = account.Id
+                    //});
+                    //var ticket = await client.Tickets.CreateAsync(new FreshdeskTicket
+                    //{
+                    //    RequesterId = contact.Id,
+                    //    Subject = "Test",
+                    //    Description = "This is a test issue",
+                    //    FrDueBy = DateTime.UtcNow + TimeSpan.FromHours(5),
+                    //    DueBy = DateTime.UtcNow + TimeSpan.FromDays(2)
+                    //});
                 }
                 catch (Exception ex)
                 {

@@ -1,5 +1,14 @@
-﻿namespace DBA.FreshdeskSharp.Models
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
+
+namespace DBA.FreshdeskSharp.Models
 {
+    public class FreshDeskTicketWrapper<T> where T :  class
+    {
+        [JsonProperty("tickets")]
+        public List<FreshdeskTicket<T>> Tickets { get; set; }
+    }
+
     public class FreshdeskTicket : FreshdeskTicket<FreshdeskCustomFields>
     {
         public FreshdeskTicket()
